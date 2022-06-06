@@ -1,0 +1,44 @@
+<h1>
+  <%= @bundle.name %>
+  <%= presenter.state %>
+</h1>
+
+<% if can?(:manage, @bundle) %>
+  <ul class="actions list-unstyled">
+    <% if @bundle.live? %>
+      You cannot edit a live bundle.  If you need to make changes, please retract it first.  Proceed with caution.
+    <% else %>
+      <li>
+        <%= link_to "Edit", edit_bundle_path(@bundle) %>
+      </li>
+      <li>
+        <%= button_to "Delete", bundle_path(@bundle), method: :delete, data: { confirm: "Are you sure?  This cannot be undone." } %>
+      </li>
+    <% end %>
+
+    <%= aasm_buttons(@bundle) %>
+  </ul>
+<% end %>
+
+<%= render("munificent/admin/common/record",
+  record: @bundle,
+  attributes: %i[
+    name
+    price
+    fundraiser
+  ],
+) %>
+
+<h2>Tiers</h2>
+
+<%= render "munificent/admin/common/records",
+  type: "tiers",
+  records: @bundle.bundle_tiers.order(price_decimals: :desc),
+  fields: %i[
+    id
+    name
+    price
+    starts_at
+    ends_at
+    games
+  ] %>

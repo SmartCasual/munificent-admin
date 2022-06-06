@@ -1,5 +1,7 @@
+require "rotp"
+
 FactoryBot.define do
-  factory :admin_user, aliases: [:admin] do
+  factory :"munificent/admin/user", aliases: [:admin] do
     sequence(:name) { |n| "Admin User #{n}" }
     sequence(:email_address) { |n| "test-admin-#{n}@example.com" }
 

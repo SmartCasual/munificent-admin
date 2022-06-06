@@ -1,0 +1,11 @@
+<h1>Charities</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @charities,
+  fields: %i[
+    id
+    name
+    fundraisers
+  ] %>
+
+<%= link_to "New charity", new_charity_path %>

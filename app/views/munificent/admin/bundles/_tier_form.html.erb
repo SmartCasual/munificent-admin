@@ -1,0 +1,13 @@
+<%= yield %>
+
+<%= tier_form.table(css_class: ["tier-form", ("new-tier" if tier_form.object.new_record?)]) do %>
+  <%= tier_form.field(:text_field, :name, optional: true) %>
+  <%= tier_form.money(:price, default_currency: tier_form.object.bundle.fundraiser&.main_currency) %>
+  <%= tier_form.field(:text_field, :starts_at, optional: true) %>
+  <%= tier_form.field(:text_field, :ends_at, optional: true) %>
+  <%= tier_form.field(:select, :game_ids, source: Munificent::Game.order(:name).pluck(:name, :id), label: "Games", multiple: true) %>
+
+  <% if tier_form.object.persisted? %>
+    <%= tier_form.check_box :_destroy, label: "Delete?" %>
+  <% end %>
+<% end %>

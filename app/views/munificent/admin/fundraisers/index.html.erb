@@ -1,0 +1,17 @@
+<h1>Fundraisers</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @fundraisers,
+  fields: %i[
+    id
+    name
+    description
+    main_currency
+    starts_at
+    ends_at
+    overpayment_mode
+    short_url
+    state
+  ] %>
+
+<%= link_to "New fundraiser", new_fundraiser_path %>

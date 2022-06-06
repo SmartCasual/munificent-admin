@@ -8,7 +8,6 @@ module CucumberTagHelpers
   def self.user_permission_levels
     %i[
       admin
-      donator
       anonymous
     ].freeze
   end
@@ -36,11 +35,9 @@ Before do |scenario|
   case permission_level
   when :admin
     ensure_logged_in(as: permission_level)
-    @current_admin_user.update(
+    @current_user.update(
       CucumberTagHelpers.access_flags(tags).index_with(true),
     )
     reload_page
-  when :donator
-    ensure_logged_in(as: permission_level)
   end
 end

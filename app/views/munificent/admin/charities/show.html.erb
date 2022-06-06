@@ -1,0 +1,23 @@
+<h1>
+  <%= @charity.name %>
+</h1>
+
+<% if can?(:manage, @game) %>
+  <ul class="actions list-unstyled">
+    <li>
+      <%= link_to "Edit", edit_charity_path(@charity) %>
+    </li>
+    <li>
+      <%= button_to "Delete", charity_path(@charity), method: :delete, data: { confirm: "Are you sure?  This cannot be undone." } %>
+    </li>
+  </ul>
+<% end %>
+
+<%= render("munificent/admin/common/record",
+  record: @charity,
+  attributes: %i[
+    name
+    description
+    fundraisers
+  ],
+) %>

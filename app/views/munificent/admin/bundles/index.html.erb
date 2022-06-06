@@ -1,0 +1,15 @@
+<h1>Bundles</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @bundles,
+  fields: %i[
+    id
+    name
+    price
+    starts_at
+    ends_at
+    state
+    fundraiser
+  ] %>
+
+<%= link_to "New bundle", new_bundle_path %>

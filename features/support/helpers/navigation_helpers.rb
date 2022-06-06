@@ -1,56 +1,56 @@
-module NavigationHelpers
-  def go_to_homepage
-    go_to_if_not_at("/")
-  end
+module Munificent
+  module Admin
+    module NavigationHelpers
+      def reload_page
+        visit current_path
+      end
 
-  def go_to_donations(fundraiser: nil)
-    go_to_homepage
-    click_on (fundraiser || Fundraiser.active.first).name
-    click_on "See current donations"
-  end
+      def go_to_admin_homepage
+        visit munificent_admin.root_path
+      end
 
-  def go_to_assigned_bundles
-    go_to_if_not_at(account_bundles_path)
-  end
+      def go_to_admin_area(area)
+        within ".main-nav" do
+          click_on area unless page.has_css?("span", text: area)
+        end
+      end
 
-  def go_to_game_keys
-    go_to_assigned_bundles
-    click_link "Bundle 1"
-  end
+      def go_to_admin_games
+        go_to_admin_area "Games"
+      end
 
-  def go_to_profile(donator)
-    click_on donator.display_name
-  end
+      def go_to_admin_game(game, edit: false)
+        game = Game.find_by(name: game) if game.is_a?(String)
+        go_to_admin_record(game, within: "Games", edit:)
+      end
 
-  def go_to_curated_streamer(streamer, fundraiser: nil, admin: false)
-    fundraiser ||= Fundraiser.active.first
+      def go_to_game_csv_upload(game)
+        go_to_admin_game(game)
 
-    path = if admin
-      admin_fundraiser_curated_streamer_path(fundraiser, streamer)
-    else
-      fundraiser_curated_streamer_path(fundraiser, streamer)
-    end
+        click_on "Upload keys via CSV"
+        expect(page).to have_text("#{game.name} CSV upload")
+      end
 
-    go_to_if_not_at(path)
-  end
+      def go_to_admin_bundle(bundle, edit: false)
+        go_to_admin_record(bundle, within: "Bundles", edit:)
+      end
 
-  def go_to_first_fundraiser
-    go_to_fundraiser(name: Fundraiser.active.first.name)
-  end
+      def go_to_users
+        go_to_admin_area "Admin users"
+      end
 
-  def go_to_fundraiser(fundraiser = nil, name: nil)
-    go_to_homepage
-    click_on name || fundraiser.name
-  end
+      def go_to_user(user, edit: false)
+        go_to_admin_record(user, within: "Admin users", edit:)
+      end
 
-  def go_to_if_not_at(path)
-    if current_path == path
-      false
-    else
-      visit path
-      true
+      def go_to_admin_record(record, within:, edit: false)
+        go_to_admin_area(within)
+
+        click_on record.name
+        click_on "Edit" if edit
+      end
     end
   end
 end
 
-World(NavigationHelpers)
+World(Munificent::Admin::NavigationHelpers)

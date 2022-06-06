@@ -1,32 +1,17 @@
 module LoginHelpers
   def log_in_admin_with(email_address, otp_secret:, navigate: true, expect_failure: false)
-    visit "/admin/login" if navigate
+    visit "/login" if navigate
 
     fill_in "Email address", with: email_address
     fill_in "Password", with: "password123"
-    click_on "Login"
+    click_on "Log in"
 
     complete_2sv(otp_secret) if otp_secret.present?
 
     unless expect_failure
-      @current_admin_user = AdminUser.find_by!(email_address:)
-      expect(page).to have_css("#current_user a", text: @current_admin_user.name)
-      @current_admin_user
-    end
-  end
-
-  def log_in_donator_with(email_address:, password:, navigate: true, expect_failure: false)
-    click_on "Log in" if navigate
-
-    fill_in "Email", with: email_address
-    fill_in "Password", with: password
-    click_button "Log in"
-
-    if expect_failure
-      expect(page).to have_text("Invalid")
-      expect(logged_in?).to be(false)
-    else
-      expect(logged_in?).to be(true)
+      @current_user = Munificent::Admin::User.find_by!(email_address:)
+      expect(page).to have_css(".main-nav .user a", text: @current_user.name)
+      @current_user
     end
   end
 
@@ -38,31 +23,19 @@ module LoginHelpers
   def log_in_as(user_or_factory, traits: nil, **kwargs)
     user = case user_or_factory
     when Symbol
-      FactoryBot.create(user_or_factory, *traits)
-    when AdminUser, Donator
+      create(user_or_factory, *traits)
+    when Munificent::Admin::User
       user_or_factory
     else
-      raise ArgumentError, "Please provide an `AdminUser`/`Donator` instance, or a factory name."
+      raise ArgumentError, "Please provide an `Admin::User` instance, or a factory name."
     end
 
-    case user
-    when Donator
-      use_magic_link(user)
-    when AdminUser
-      log_in_admin_with(user.email_address, otp_secret: user.otp_secret, **kwargs)
-    end
+    log_in_admin_with(user.email_address, otp_secret: user.otp_secret, **kwargs)
 
     user
   end
 
-  def use_magic_link(donator)
-    visit log_in_via_token_account_path(donator, token: donator.token)
-    click_on "Log in via token"
-    @current_donator = donator
-    expect(logged_in?).to be(true)
-  end
-
-  def ensure_logged_in(as: :donator, **kwargs)
+  def ensure_logged_in(as: :admin, **kwargs)
     log_in_as(as, **kwargs)
   end
 

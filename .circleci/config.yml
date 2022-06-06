@@ -2,18 +2,17 @@ version: 2.1
 
 orbs:
   ruby: circleci/ruby@1.4
-  node: circleci/node@5.0.2
   browser-tools: circleci/browser-tools@1.2
 
 jobs:
-  test: # our next job, called "test"
+  test:
     docker:
       - image: cimg/ruby:3.1.2-browsers # this is our primary docker image, where step commands run.
       - image: cimg/redis:6.2
       - image: cimg/postgres:13.5
         environment: # add POSTGRES environment variables.
           POSTGRES_USER: circleci
-          POSTGRES_DB: jingle_jam_test
+          POSTGRES_DB: munificent_admin_test
           POSTGRES_PASSWORD: ""
           POSTGRES_HOST_AUTH_METHOD: trust
     # environment variables specific to Ruby/Rails, applied to the primary container.
@@ -22,26 +21,12 @@ jobs:
       BUNDLE_JOBS: "3"
       BUNDLE_RETRY: "3"
       CI: true
-      FROM_EMAIL_ADDRESS: "jingle-jam@example.com"
+      FROM_EMAIL_ADDRESS: "munificent-admin@example.com"
       HMAC_SECRET: "c360bcae-df63-4616-808a-860f03d7da6b"
-      PAYPAL_API_ENDPOINT: "https://api.paypal.example.com"
-      PAYPAL_CLIENT_ID: "AakBwrFPLdPU4-oKX939jxpGlL-0_J9E10z1dSapKjp2G-o8pte9OjKw8bBl\
-        QEHKbyFWU9WqAdTMgupz"
-      PAYPAL_EMAIL_ADDRESS: "abcde@example.com"
-      PAYPAL_MERCHANT_ID: "abcde"
-      PAYPAL_WEBHOOK_ID: "abcde"
       PGHOST: 127.0.0.1
       PGPASSWORD: ""
       PGUSER: circleci
-      STRIPE_PUBLIC_KEY: "pk_test_a67ef84afbf01ea3d84adda4fabc4adc"
-      STRIPE_SECRET_KEY: "sk_test_9800ec742bc5b49f66fc6430c7359b3d"
-      STRIPE_WEBHOOK_SECRET_KEY: "whsec_ab50669157228f63305e8fea9244baa2"
-      TWITCH_CLIENT_ID: "abcde"
-      TWITCH_CLIENT_SECRET: "abcde"
     steps:
-      - node/install:
-          node-version: '16.14'
-          install-yarn: true
       - browser-tools/install-chrome:
           replace-existing: true
       - browser-tools/install-chromedriver
@@ -52,9 +37,6 @@ jobs:
             chromedriver --version
       - checkout
       - ruby/install-deps
-      - node/install-packages:
-          pkg-manager: yarn
-          with-cache: true
       # Here we make sure that the secondary container boots
       # up before we run operations on the database.
       - run:
@@ -68,7 +50,7 @@ jobs:
           command: RAILS_ENV=test bundle exec rails db:schema:load --trace
       - run:
           name: Tests
-          command: bundle exec rake
+          command: RAILS_ENV=test bundle exec rake
     # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
     resource_class: large
 

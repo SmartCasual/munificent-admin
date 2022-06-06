@@ -1,0 +1,41 @@
+<h1>
+  <%= @fundraiser.name %>
+  <%= presenter.state %>
+</h1>
+
+<% if can?(:manage, @fundraiser) %>
+  <ul class="actions list-unstyled">
+    <li>
+      <%= link_to "Edit", edit_fundraiser_path(@fundraiser) %>
+    </li>
+    <li>
+      <%= button_to "Delete", fundraiser_path(@fundraiser), method: :delete, data: { confirm: "Are you sure?  This cannot be undone." } %>
+    </li>
+    <%= aasm_buttons(@fundraiser) %>
+  </ul>
+<% end %>
+
+<%= render("munificent/admin/common/record",
+  record: @fundraiser,
+  attributes: %i[
+    name
+    description
+    main_currency
+    starts_at
+    ends_at
+    overpayment_mode
+    short_url
+    state
+  ],
+) %>
+
+<h2>Bundles</h2>
+
+<%= render "munificent/admin/common/records",
+  type: "bundles",
+  records: @fundraiser.bundles,
+  fields: %i[
+    id
+    name
+    state
+  ] %>

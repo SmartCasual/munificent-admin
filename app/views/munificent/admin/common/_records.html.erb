@@ -1,0 +1,38 @@
+<% if records.any? %>
+  <table class="table table-striped <%= type if defined?(type) %>">
+    <thead>
+      <tr>
+        <% fields.each do |field| %>
+          <th>
+            <% case field %>
+            <% when :id %>
+              ID
+            <% else %>
+              <%= field.to_s.humanize %>
+            <% end %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% records.each do |record| %>
+        <% presented_record = Munificent::Admin::ApplicationPresenter.present(record) %>
+        <tr class="<%= dom_id(record) %>">
+          <% fields.each do |field| %>
+            <td class="col-<%= field %>">
+              <% if (value = presented_record.public_send(field)).respond_to?(:id) %>
+                <%= link_to value %>
+              <% elsif value.present? %>
+                <%= value %>
+              <% else %>
+                <span class="not-set">(not set)</span>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No records found.</p>
+<% end %>

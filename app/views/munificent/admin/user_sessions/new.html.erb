@@ -1,0 +1,9 @@
+<h1>Log in</h1>
+
+<%= form_for @user_session, url: user_session_path do |f| %>
+  <%= f.field(:email_field, :email_address) %>
+  <%= f.field(:password_field, :password) %>
+  <%= f.check_box(:remember_me, checked: true) %>
+
+  <button class="btn btn-primary">Log in</button>
+<% end %>

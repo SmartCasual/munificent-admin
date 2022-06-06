@@ -1,52 +1,32 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require "spec_helper"
 
-ENV["RAILS_ENV"] ||= "test"
-ENV["OTP_ISSUER"] = "Jingle Jam (test)"
-ENV["PAYPAL_API_ENDPOINT"] = "https://api.paypal.example.com"
+require "byebug"
+require "factory_bot"
+require "factory_bot_rails"
+require "munificent"
+FactoryBot.find_definitions
 
-require File.expand_path("../config/environment", __dir__)
+ENV["RAILS_ENV"] ||= "test"
+ENV["OTP_ISSUER"] = "Munificent admin (test)"
+ENV["RAILS_ROOT"] = File.expand_path("test/dummy", __dir__)
+
+require File.expand_path("../test/dummy/config/environment", __dir__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
 
-require_relative "../test/support/queue_type"
-require_relative "../test/support/retry_helpers"
-require_relative "../test/support/test_data"
 require_relative "../test/support/with_env"
-require_relative "../test/support/with_key_assignment_processor"
-
-FactoryBot.find_definitions
 
 require "webmock/rspec"
 WebMock.disable_net_connect!(allow_localhost: true)
 
-VCR.configure do |config|
-  config.cassette_library_dir = "test/fixtures/vcr_cassettes"
-  config.hook_into :webmock
-  config.configure_rspec_metadata!
-end
-
-require "aasm/rspec"
-
-require "sidekiq/testing"
-Sidekiq::Testing.inline!
-
-# Checks for pending migrations and applies them before tests are run.
-# If you are not using ActiveRecord, you can remove these lines.
-begin
-  ActiveRecord::Migration.maintain_test_schema!
-rescue ActiveRecord::PendingMigrationError => e
-  puts e.to_s.strip
-  exit 1
-end
+ENV["KMS_KEY_ID"] = "insecure-test-key"
+ENV["BLIND_INDEX_MASTER_KEY"] = "0" * 64
 
 RSpec.configure do |config|
   config.include WithEnv
-  config.include WithKeyAssignmentProcessor
-  config.include RetryHelpers
-  QueueType.apply_to(config)
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -66,7 +46,7 @@ RSpec.configure do |config|
   # You can disable this behaviour by removing the line below, and instead
   # explicitly tag your specs with their type, e.g.:
   #
-  #     RSpec.describe UsersController, type: :controller do
+  #     RSpec.describe Admin::UsersController, type: :controller do
   #       # ...
   #     end
   #
@@ -81,21 +61,6 @@ RSpec.configure do |config|
 
   config.before do
     ActionMailer::Base.deliveries.clear
-    Paypal::REST.reset_connection
-  end
-
-  config.around do |example|
-    TestData.clear
-    KeyAssignment::RequestProcessor.clear_all_queues
-    example.run
-    KeyAssignment::RequestProcessor.clear_all_queues
-    TestData.clear
-  end
-
-  config.around(with_key_assignment_processor: true) do |example|
-    with_key_assignment_processor do
-      example.run
-    end
   end
 
   config.include FactoryBot::Syntax::Methods
