@@ -1,0 +1,12 @@
+<h1>Edit bundle</h1>
+
+<%= render "form", record: @bundle do |f| %>
+  <h4>Tiers</h4>
+  <%= f.fields_for(:bundle_tiers, @bundle.bundle_tiers.sort_by { |t| [t.price, t.id || -1] }.reverse) do |tier_form| %>
+    <%= render("munificent/admin/bundles/tier_form", tier_form:) do %>
+      <% if tier_form.object.new_record? %>
+        <h5>New tier</h5>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

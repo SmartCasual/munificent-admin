@@ -1,0 +1,15 @@
+<h1>Games</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @games,
+  fields: %i[
+    id
+    name
+    description
+    unassigned_keys
+    assigned_keys
+    created_at
+    updated_at
+  ] %>
+
+<%= link_to "New game", new_game_path %>

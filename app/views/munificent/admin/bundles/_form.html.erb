@@ -1,0 +1,15 @@
+<%= form_for record do |f| %>
+  <fieldset class="record">
+    <%= f.field(:text_field, :name) %>
+    <%= f.field(:select, :fundraiser_id,
+      label: "Fundraiser",
+      source: Munificent::Fundraiser.order(:name).pluck(:name, :id),
+    ) %>
+  </fieldset>
+
+  <%= yield f %>
+
+  <button class="btn btn-primary">Save</button>
+
+  <%= link_to "Cancel", record.persisted? ? bundle_path(record) : bundles_path %>
+<% end %>

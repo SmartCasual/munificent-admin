@@ -1,0 +1,10 @@
+<h1>Assigned bundles</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @donator_bundles,
+  fields: %i[
+    id
+    donator
+    bundle
+    created_at
+  ] %>

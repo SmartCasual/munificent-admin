@@ -1,0 +1,15 @@
+<h1>Users</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @users,
+  fields: %i[
+    id
+    name
+    email_address
+    current_login_at
+    login_count
+    permissions
+    states
+  ] %>
+
+<%= link_to "New user", new_user_path %>

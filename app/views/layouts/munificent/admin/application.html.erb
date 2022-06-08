@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Munificent admin</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <%= stylesheet_link_tag "munificent-admin", media: "all" %>
+    <%= javascript_importmap_tags "munificent_admin/application" %>
+    <%= content_for :head %>
+  </head>
+
+  <body>
+    <% if logged_in? && verified_2sv? %>
+      <nav class="main-nav">
+        <% if can?(:read, :self) %>
+          <div class="dashboard">
+            <ul>
+              <li><%= nav_link "Dashboard", root_path %></li>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if can?(:read, :public_info) %>
+          <div class="data-entry">
+            <h2>Data entry</h2>
+
+            <ul>
+              <li><%= nav_link "Fundraisers", fundraisers_path %></li>
+              <li><%= nav_link "Bundles", bundles_path %></li>
+              <li><%= nav_link "Charities", charities_path %></li>
+              <li><%= nav_link "Games", games_path %></li>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if can?(:read, :donation_info) %>
+          <div class="support">
+            <h2>Support</h2>
+
+            <ul>
+              <li><%= nav_link "Donators", donators_path %></li>
+              <li><%= nav_link "Donations", donations_path %></li>
+              <li><%= nav_link "Assigned bundles", donator_bundles_path %></li>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if can?(:read, :user_accounts) %>
+          <div class="restricted">
+            <h2>Restricted</h2>
+
+            <ul>
+              <li><%= nav_link "Admin users", users_path %></li>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if can?(:read, :self) %>
+          <ul class="user">
+            <li><%= link_to current_user %></li>
+            <li><%= button_to "Log out", user_session_path, method: :delete %>
+          </ul>
+        <% end %>
+      </nav>
+    <% end %>
+
+    <main>
+      <% if (flash_entries = flash.to_hash.slice("alert", "notice")).any? %>
+        <ul class="notices list-unstyled">
+          <% flash_entries.each do |_, message| %>
+            <% if message.present? %>
+              <li><%= message %></li>
+            <% end %>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+<h1><%= @game.name %></h1>
+
+<% if can?(:manage, @game) %>
+  <ul class="actions list-unstyled">
+    <li><%= link_to "Edit", edit_game_path(@game) %></li>
+    <% if can?(:manage, Munificent::Key) %>
+      <li><%= link_to "Upload keys via CSV", csv_upload_game_path(@game) %></li>
+    <% end %>
+    <li>
+      <%= button_to "Delete", game_path(@game), method: :delete, data: { confirm: "Are you sure?  This cannot be undone." } %>
+    </li>
+  </ul>
+<% end %>
+
+<%= render("munificent/admin/common/record",
+  record: @game,
+  attributes: %i[
+    name
+    description
+    unassigned_keys
+    assigned_keys
+    created_at
+    updated_at
+  ],
+) %>

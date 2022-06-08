@@ -3,12 +3,20 @@
 # newer version of cucumber-rails. Consider adding your own code to a new file
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
+ENV["RAILS_ENV"] ||= "test"
 
-ENV["OTP_ISSUER"] = "Jingle Jam (test)"
-ENV["TWITCH_EMBED_ENABLED"] = "false"
+require "byebug"
+require "factory_bot"
+require "munificent"
+FactoryBot.find_definitions
+World(FactoryBot::Syntax::Methods)
+
+ENV["OTP_ISSUER"] = "Munificent admin (test)"
+ENV["RAILS_ROOT"] = File.expand_path("../../test/dummy", __dir__)
+
+require File.expand_path("../../test/dummy/config/environment", __dir__)
 
 require "cucumber/rails"
-
 require "webdrivers"
 require "webdrivers/chromedriver"
 
@@ -19,40 +27,9 @@ WebMock.disable_net_connect!(allow_localhost: true, allow: driver_urls)
 require "rspec/mocks"
 require "cucumber/rspec/doubles"
 
-FactoryBot.find_definitions
-World(FactoryBot::Syntax::Methods)
-
-require "sidekiq/testing"
-Sidekiq::Testing.inline!
-
-require_relative "../../test/support/with_env"
-World(WithEnv)
-
-require_relative "../../test/support/stripe_test_helpers"
-World(StripeTestHelpers)
-
-require_relative "../../test/support/test_data"
-
-require_relative "../../test/support/with_key_assignment_processor"
-World(WithKeyAssignmentProcessor)
-
-require_relative "../../test/support/retry_helpers"
-World(RetryHelpers)
-
-Around do |_, block|
-  TestData.clear
-  with_key_assignment_processor(&block)
-  TestData.clear
-end
-
-Before("not @real_payment_providers") do
-  TestData[:fake_payment_providers] = true
-end
-
-Around("@real_payment_providers") do |_, block|
-  WebMock.disable!
-  block.call
-  WebMock.enable!
+require "authlogic/test_case"
+Before do
+  activate_authlogic
 end
 
 TEST_PORT = 30_001
@@ -63,7 +40,6 @@ Capybara.configure do |config|
 end
 ActionMailer::Base.default_url_options[:port] = TEST_PORT
 ENV["APP_HOST"] = "127.0.0.1:#{TEST_PORT}"
-OmniAuth.config.full_host = "http://#{ENV.fetch('APP_HOST', nil)}"
 
 ActionController::Base.allow_rescue = false
 
@@ -87,10 +63,4 @@ After do
   ::RSpec::Mocks.verify
 ensure
   ::RSpec::Mocks.teardown
-end
-
-Around("@twitch_embed_enabled") do |_, scenario|
-  with_env("TWITCH_EMBED_ENABLED" => "true") do
-    scenario.call
-  end
 end

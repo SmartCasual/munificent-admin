@@ -1,0 +1,9 @@
+<h1>New bundle</h1>
+
+<%= render "form", record: @bundle do |f| %>
+  <%= f.fields_for :bundle_tiers do |tier_form| %>
+    <%= render("munificent/admin/bundles/tier_form", tier_form:) do %>
+      <h5>Default tier</h5>
+    <% end %>
+  <% end %>
+<% end %>

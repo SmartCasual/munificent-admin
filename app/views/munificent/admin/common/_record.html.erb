@@ -1,0 +1,18 @@
+<table class="record table table-striped <%= dom_id(record) %>">
+  <tbody>
+    <% presented_record = Munificent::Admin::ApplicationPresenter.present(record) %>
+
+    <% attributes.each do |attribute| %>
+      <tr class="row-<%= attribute %>">
+        <td class="attribute"><%= attribute.to_s.humanize %></td>
+        <td class="value">
+          <% if (value = presented_record.public_send(attribute)).respond_to?(:id) && value != record %>
+            <%= link_to value %>
+          <% else %>
+            <%= value %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

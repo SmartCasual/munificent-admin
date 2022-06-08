@@ -1,0 +1,29 @@
+<%= form_for record do |f| %>
+  <fieldset class="record">
+    <%= f.field(:text_field, :name) %>
+    <%= f.field(:text_field, :email_address) %>
+    <%= f.field(:password_field, :password) %>
+    <%= f.field(:password_field, :password_confirmation) %>
+  </fieldset>
+
+  <fieldset class="permissions">
+    <legend>Permissions</legend>
+
+    <%= f.check_box(:support) %>
+    <%= f.check_box(:data_entry) %>
+    <%= f.check_box(:manages_users) %>
+    <%= f.check_box(:full_access) %>
+  </fieldset>
+
+  <fieldset class="states">
+    <legend>States</legend>
+
+    <%= f.check_box(:active) %>
+    <%= f.check_box(:confirmed) %>
+    <%= f.check_box(:approved) %>
+  </fieldset>
+
+  <button class="btn btn-primary">Save</button>
+
+  <%= link_to "Cancel", record.persisted? ? user_path(record) : users_path %>
+<% end %>

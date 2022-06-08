@@ -1,0 +1,15 @@
+<h1>Donations</h1>
+
+<%= render "munificent/admin/common/records",
+  records: @donations,
+  fields: %i[
+    id
+    amount
+    donator_name
+    message
+    state
+    curated_streamer
+    donated_by
+    fundraiser
+    created_at
+  ] %>
