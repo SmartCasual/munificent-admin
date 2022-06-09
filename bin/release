@@ -1,4 +1,4 @@
 gem build
-gem push munificent-admin$1.gem
+gem push munificent-admin-$1.gem
 git tag $1
 git push --tags
