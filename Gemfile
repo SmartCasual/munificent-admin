@@ -6,6 +6,7 @@ gemspec
 
 gem "byebug", "~> 11.1", platforms: %i[mri mingw x64_mingw]
 gem "importmap-rails", "~> 1.1"
+gem "munificent", path: "../munificent"
 gem "pg", "~> 1.3"
 gem "puma", "~> 5.6"
 gem "rubocop", "~> 1.25"

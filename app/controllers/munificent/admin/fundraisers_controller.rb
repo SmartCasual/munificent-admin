@@ -22,7 +22,6 @@ module Munificent
 
       def update
         @fundraiser.assign_attributes(fundraiser_params)
-        @fundraiser.fundraiser_tiers = @fundraiser.fundraiser_tiers.compact_blank
 
         if @fundraiser.save
           flash[:notice] = "Fundraiser saved"
